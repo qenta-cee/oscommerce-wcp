@@ -425,7 +425,7 @@ class wirecard_checkout_page
 
         $sql = 'SELECT customers_dob, customers_fax FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id="' . $consumerID . '" LIMIT 1;';
         $result = tep_db_query($sql);
-        $consumerInformation = mysql_fetch_assoc($result);
+        $consumerInformation = $result->fetch_assoc();
         if ($consumerInformation['customers_dob'] != '0000-00-00 00:00:00')
         {
             $consumerBirthDateTimestamp = strtotime($consumerInformation['customers_dob']);
@@ -473,22 +473,28 @@ class wirecard_checkout_page
                           'consumerBillingCountry' => $billingInformation['country']['iso_code_2'],
                           'consumerBillingPhone' => $order->customer['telephone'],
                           'consumerEmail' => $order->customer['email_address'],
-                          'consumerBirthDate' => $consumerBirthDate);
+                          'consumerBirthDate' => $consumerBirthDate,
+                          'consumerMerchantCrmId' => md5($order->customer['email_address']));
 
         if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME == 'True')
             $postData['windowName'] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME;
 
         $requestFingerprintOrder = 'secret';
-        $requestFingerprintSeed = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET;
-        foreach ($postData AS $parameterName => $parameterValue)
-        {
+        $tempArray = array('secret' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+        foreach ($postData AS $parameterName => $parameterValue) {
             $requestFingerprintOrder .= ',' . $parameterName;
-            $requestFingerprintSeed .= $parameterValue;
+            $tempArray[(string)$parameterName] = (string)$parameterValue;
         }
         $requestFingerprintOrder .= ',requestFingerprintOrder';
-        $requestFingerprintSeed .= $requestFingerprintOrder;
+        $tempArray['requestFingerprintOrder'] = $requestFingerprintOrder;
+
+        $hash = hash_init('sha512', HASH_HMAC, MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+        foreach ($tempArray as $key => $value) {
+            hash_update($hash, $value);
+        }
+
         $postData['requestFingerprintOrder'] = $requestFingerprintOrder;
-        $postData['requestFingerprint'] = md5(html_entity_decode($requestFingerprintSeed));
+        $postData['requestFingerprint'] = hash_final($hash);
 
         $result = tep_db_query("INSERT INTO " . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TRANSACTION_TABLE . " (TRID, PAYSYS, DATE) VALUES ('" . $this->transaction_id . "', '" . $paymentType . "', NOW())");
 
@@ -692,7 +698,7 @@ class wirecard_checkout_page
         // lets check, if you have an order-id in our transaction table
         $sql = 'SELECT ORDERID FROM ' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TRANSACTION_TABLE . ' WHERE TRID="' . $this->transaction_id . '" LIMIT 1;';
         $result = tep_db_query($sql);
-        $row = mysql_fetch_assoc($result);
+        $row = $result->fetch_assoc();
         if ($row === false || (int)$row['ORDERID'] === 0)
         {
             $this->debug_log("no order id for trid:" . $this->transaction_id);
@@ -791,10 +797,10 @@ class wirecard_checkout_page
 
     function verifyFingerprint($responseArray, &$confirmReturnMessage = '')
     {
+        $tempArray = [];
         $responseFingerprintOrder = $responseArray['responseFingerprintOrder'];
         $responseFingerprint = $responseArray['responseFingerprint'];
 
-        $str4responseFingerprint = "";
         $mandatoryFingerprintFields = 0;
         $secretUsed = 0;
 
@@ -817,18 +823,24 @@ class wirecard_checkout_page
 
             if (strcmp($key, 'secret') == 0)
             {
-                $str4responseFingerprint .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET;
+                $tempArray[(string)$key] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET;
                 $secretUsed = 1;
             }
             else
             {
-                $str4responseFingerprint .= $responseArray[$key];
+                $tempArray[(string)$key] = $responseArray[$key];
             }
         }
 
-        // calc the fingerprint
-        $responseFingerprintCalc = md5($str4responseFingerprint);
-        $this->debug_log('Calculated Fingerprint: ' . $responseFingerprintCalc . '. Compare with returned Fingerprint.');
+        $hash = hash_init('sha512', HASH_HMAC, MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+
+        foreach ($tempArray as $key => $value) {
+            hash_update($hash, $value);
+        }
+
+        $responseFingerprintSeed = hash_final($hash);
+
+        $this->debug_log('Calculated Fingerprint: ' . $responseFingerprintSeed . '. Compare with returned Fingerprint.');
 
         if (!$secretUsed)
         {
@@ -842,7 +854,7 @@ class wirecard_checkout_page
         }
         else
         {
-            if ((strcmp($responseFingerprintCalc, $responseFingerprint) != 0))
+            if ((strcmp($responseFingerprintSeed, $responseFingerprint) != 0))
             {
                 $confirmReturnMessage = $this->_wirecardCheckoutPageConfirmResponse('Fingerprint validation failed.');
                 return false;
@@ -1041,7 +1053,7 @@ class wirecard_checkout_page
         {
             $trid = tep_create_random_value(16);
             $result = tep_db_query("SELECT TRID FROM " . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TRANSACTION_TABLE . " WHERE TRID = '" . $trid . "'");
-        } while (mysql_num_rows($result));
+        } while ($result->num_rows);
 
         return $trid;
 
