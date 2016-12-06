@@ -312,7 +312,7 @@ class wirecard_checkout_page
 
         $sql = 'SELECT (COUNT(*) > 0) as cnt FROM ' . TABLE_CUSTOMERS . ' WHERE DATEDIFF(NOW(), customers_dob) > 6574 AND customers_id="' . $consumerID . '"';
 
-        $result = mysql_fetch_assoc(tep_db_query($sql));
+        $result = tep_db_query($sql)->fetch_assoc();
 
         $ageCheck = (bool)$result['cnt'];
         $country_code = $order->billing['country']['iso_code_2'];
@@ -339,7 +339,7 @@ class wirecard_checkout_page
         $amount = tep_round($total * $currencies->get_value($currency), 2);
 
         $sql = 'SELECT (COUNT(*) > 0) as cnt FROM ' . TABLE_CUSTOMERS . ' WHERE DATEDIFF(NOW(), customers_dob) > 6574 AND customers_id="' . $consumerID . '"';
-        $result = mysql_fetch_assoc(tep_db_query($sql));
+        $result = tep_db_query($sql)->fetch_assoc();
 
         $ageCheck = (bool)$result['cnt'];
         $country_code = $order->billing['country']['iso_code_2'];
@@ -1079,7 +1079,7 @@ class wirecard_checkout_page
     {
         $sql = 'SELECT zone_code FROM ' . TABLE_ZONES . ' WHERE zone_name=\'' . $zoneName . '\' LIMIT 1;';
         $result = tep_db_query($sql);
-        $resultRow = mysql_fetch_row($result);
+        $resultRow = $result->fetch_row();
         return $resultRow[0];
     }
 
