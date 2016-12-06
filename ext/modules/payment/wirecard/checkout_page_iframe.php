@@ -25,6 +25,7 @@ not use this plugin if you do not agree to the terms of use!
 chdir('../../../../');
 require('includes/application_top.php');
 require_once (DIR_FS_CATALOG.'includes/modules/payment/wirecard_checkout_page.php');
+require_once ('includes/languages/'. $_SESSION["language"] .'/modules/payment/wirecard_checkout_page.php');
 
 // if the customer is not logged on, redirect them to the login page
 if (!tep_session_is_registered('customer_id')) {
@@ -81,7 +82,7 @@ $submitButton = tep_draw_button(IMAGE_BUTTON_CONTINUE, 'triangle-1-e', null, nul
 <body>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td align="center"><?php echo $redirectText ?></td>
+        <td align="center"><?php echo MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_REDIRECTTEXT; ?></td>
     </tr>
 </table>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
