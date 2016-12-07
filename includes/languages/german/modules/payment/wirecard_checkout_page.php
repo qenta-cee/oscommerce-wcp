@@ -87,6 +87,8 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SKRILLWALLET_TITLE', 'Skril
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SKRILLWALLET_DESC', 'Zahlungsoption Skrill Digital Wallet aktivieren?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MPASS_TITLE', 'mpass');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MPASS_DESC', 'Zahlungsoption mpass aktivieren?');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_TITLE', 'Ihre Zahlung wurde vom Finanzinstitut noch nicht best&auml;tigt');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_DESC', 'Die Zahlungsbest&auml;tigung ist ausst&auml;ndig, sie wird sp&auml;ter zugesendet.');
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT_TITLE','Minimalbetrag Kauf auf Rechnung');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT_DESC','Geben sie den Minimalbetrag f&uuml;r Kauf auf Rechnung an.  (&euro;)');

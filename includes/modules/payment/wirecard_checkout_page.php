@@ -29,6 +29,7 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_RETURN', 'ext/modules/payment/wire
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIRM', 'ext/modules/payment/wirecard/checkout_page_confirm.php');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CHECKOUT', 'ext/modules/payment/wirecard/checkout_page_checkout.php');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IFRAME', 'ext/modules/payment/wirecard/checkout_page_iframe.php');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SUCCESS', 'ext/modules/payment/wirecard/checkout_page_success.php');
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PLUGINVERSION', '1.4.1');
 
@@ -631,7 +632,7 @@ class wirecard_checkout_page
      */
     function after_process()
     {
-        global $insert_id;
+        global $insert_id, $order, $cart;
 
         if ($insert_id)
         {
@@ -644,25 +645,18 @@ class wirecard_checkout_page
             {
                 $this->debug_log('orderID set for transaction.');
             }
-            /*
-                        $sql_order_status_id = "select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ORDER_STATUS_ID'";
-                        $check_query = tep_db_query($sql_order_status_id);
-                        $payment_status = tep_db_fetch_array($check_query);
-                        $qStatus = $payment_status['configuration_value'];
+        }
+        if ($order->info['order_status'] == $this->order_status_pending ) {
+            tep_redirect(tep_href_link(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SUCCESS, '', 'SSL'));
+        } else {
+            $cart->reset(true);
+            tep_session_unregister('sendto');
+            tep_session_unregister('billto');
+            tep_session_unregister('shipping');
+            tep_session_unregister('payment');
+            tep_session_unregister('comments');
 
-                        if (!empty($qStatus))
-                        {
-                            $result1 = tep_db_query("UPDATE " . TABLE_ORDERS . " SET " .
-                            "orders_status=" . $qStatus . " " .
-                            "WHERE orders_id ='" . $insert_id . "'");
-                        }
-                        $sql_data_array = array('orders_id' => $insert_id,
-                                                'orders_status_id' => $qStatus,
-                                                'date_added' => 'now()',
-                                                'customer_notified' => '0',
-                                                'comments' => '');
-
-                        tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);*/
+            tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
         }
     }
 
@@ -899,20 +893,20 @@ class wirecard_checkout_page
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('IFrame', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME', 'False', 'Open Wirecard Checkout Page inside an IFrame.', '6', '4', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Paysys-Text', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_TEXT', '', 'Enter the text which should be displayed as description for the payment type SELECT (e.g. MasterCard, Visa, ...)', '6', '6', now())");
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type SELECT', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT', 'True',  'The customer can select the payment type whithin Wirecard Checkout Page. If activated, no other payment type is displayed within the shop', '6', '5', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Credit Card', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_CCARD', 'False', 'Credit Card', '6', '202', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type SELECT', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT', 'False',  'The customer can select the payment type whithin Wirecard Checkout Page. If activated, no other payment type is displayed within the shop', '6', '5', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Credit Card', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_CCARD', 'True', 'Credit Card', '6', '202', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Maestro SecureCode', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MAESTRO', 'False', 'Maestro SecureCode', '6', '204', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type eps Online Bank Transfer', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EPS', 'False', 'eps Online Bank Transfer', '6', '206', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type iDEAL', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_IDEAL', 'False', 'iDEAL', '6', '208', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type giropay', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_WGP', 'False', 'giropay', '6', '210', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type SOFORT Banking (PIN/TAN)', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SUE', 'False', 'SOFORT Banking (PIN/TAN)', '6', '212', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type SOFORT Banking (PIN/TAN)', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SUE', 'True', 'SOFORT Banking (PIN/TAN)', '6', '212', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Mobile Phone Invoicing', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PBX', 'False', 'Mobile Phone Invoicing', '6', '214', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type paysafecard', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PSC', 'False', 'paysafecard', '6', '216', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type @Quick', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_QUICK', 'False', '@Quick', '6', '218', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type PayPal', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PAYPAL', 'False', 'PayPal', '6', '220', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Direct Debit', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_ELV', 'False', 'Direct Debit', '6', '222', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type PayPal', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PAYPAL', 'True', 'PayPal', '6', '220', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Direct Debit', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_ELV', 'True', 'Direct Debit', '6', '222', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type CLICK2PAY', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_C2P', 'False', 'CLICK2PAY', '6', '224', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_INVOICE', 'False', 'Invoice', '6', '228', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
+        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_INVOICE', 'True', 'Invoice', '6', '228', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Credit Card MoTo', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_CCARDMOTO', 'False', 'Enable payment type Credit Card without \"Verified by Visa\" and \"MasterCard SecureCode\"', '6', '230', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type Bancontact/Mister Cash', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_BMC', 'False', 'Bancontact/Mister Cash', '6', '232', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
         tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable payment type eKonto', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EKONTO', 'False', 'eKonto', '6', '234', 'tep_cfg_select_option(array(\'False\', \'True\'), ', now())");
