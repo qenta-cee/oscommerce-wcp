@@ -25,6 +25,7 @@ not use this plugin if you do not agree to the terms of use!
 chdir('../../../../');
 require('includes/application_top.php');
 require_once (DIR_FS_CATALOG.'includes/modules/payment/wirecard_checkout_page.php');
+require_once ('includes/languages/'. $_SESSION["language"] .'/modules/payment/wirecard_checkout_page.php');
 
 // if the customer is not logged on, redirect them to the login page
 if (!tep_session_is_registered('customer_id')) {
@@ -72,16 +73,16 @@ $submitButton = tep_draw_button(IMAGE_BUTTON_CONTINUE, 'triangle-1-e', null, nul
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15" />
     <base href="<?php echo (($request_type == 'SSL') ? HTTPS_SERVER : HTTP_SERVER) . DIR_WS_CATALOG; ?>" />
-    <link rel="stylesheet" type="text/css" href="ext/jquery/ui/redmond/jquery-ui-1.8.22.css" />
-    <script type="text/javascript" src="ext/jquery/jquery-1.8.0.min.js"></script>
-    <script type="text/javascript" src="ext/jquery/ui/jquery-ui-1.8.22.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="ext/jquery/ui/redmond/jquery-ui-1.10.4.min.css" />
+    <script type="text/javascript" src="ext/jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="ext/jquery/ui/jquery-ui-1.10.4.min.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheet.css" />
 
 </head>
 <body>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td align="center"><?php echo $redirectText ?></td>
+        <td align="center"><?php echo MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_REDIRECTTEXT; ?></td>
     </tr>
 </table>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">

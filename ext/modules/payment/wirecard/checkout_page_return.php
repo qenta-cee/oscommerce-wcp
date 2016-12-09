@@ -25,6 +25,7 @@
     chdir('../../../../');
     require_once('includes/modules/payment/wirecard_checkout_page.php');
     require_once('includes/application_top.php');
+    require_once ('includes/languages/'. $_SESSION["language"] .'/modules/payment/wirecard_checkout_page.php');
 
     $redirectUrl = tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL', true, false);
 
@@ -33,11 +34,9 @@
     {
         $formFields .= tep_draw_hidden_field($param, $value);
     }
-
-    $redirectText = $_SESSION['wirecard_checkout_page']['paypage_redirecttext'];
 ?>
 <form action="<?php echo $redirectUrl; ?>" method="post" target="_parent" name="wirecardCheckoutPageReturn">
-    <?php echo $redirectText; ?>
+    <?php echo MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_REDIRECTTEXT; ?>
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td align="right">
