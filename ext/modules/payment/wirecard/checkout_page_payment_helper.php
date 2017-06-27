@@ -92,17 +92,20 @@ class wirecard_checkout_page_payments {
 	}
 
 	public function get_payment_selection( $code, $title ) {
-		$jsHelper = 'onclick="if (document.checkout_payment.payment.length) { for (var i=0; i<document.checkout_payment.payment.length; i++) { if (document.checkout_payment.payment[i].value == \'' . $code . '\') { document.checkout_payment.payment[i].checked = true; break; }}};"';
-
 		$content = '';
-		$first   = 100;
+		$first   = 0;
+		$content .= '<input id="wirecard_checkout_page_payment" type="hidden" name="wirecard_checkout_page" value="select">';
+
 		foreach ( $this->get_enabled_paymenttypes() as $payment ) {
-			if ( $first == 100 ) {
+			if ( $first == 0) {
 				$content .= '</strong></td><td>';
 			}
-			$first ++;
-			$content .= '</td></tr></tbody></table><table border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffect(this, ' . $first . ')"><td>';
-			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right"><input type="radio" name="payment" value="' . strtolower( $payment['code'] ) . '" ' . $jsHelper . '>';
+			$first++;
+			$payment_code = strtolower($payment['code']);
+			$js_helper = "document.getElementById('wirecard_checkout_page_payment').value='".$payment_code."'";
+			$content .= '</td></tr></tbody></table><table border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr><td>';
+			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right">'.
+			'<input type="radio" name="payment" value="' .$code. '" onclick='.$js_helper.'>';
 		}
 
 		$content .= '</td></tr><tr style="display:none;">';
