@@ -81,12 +81,32 @@ class wirecard_checkout_page_payments {
 	public function get_enabled_paymenttypes() {
 		$payments = array();
 		foreach ($this->get_paymenttypes() as $payment) {
-			$module = 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAYSYS_'.$payment['code'];
-			if ($module == 'True') {
-				array_push( $payment );
+			$module = "'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_".$payment['code']."'";
+			$query = tep_db_query("select configuration_value from " .TABLE_CONFIGURATION . " where configuration_key=".$module);
+			$result = tep_db_fetch_array($query);
+			if ($result['configuration_value'] == 'True') {
+				$payments[] = $payment;
 			}
 		}
 		return $payments;
 	}
 
+	public function get_payment_selection( $code, $title ) {
+		$jsHelper = 'onclick="if (document.checkout_payment.payment.length) { for (var i=0; i<document.checkout_payment.payment.length; i++) { if (document.checkout_payment.payment[i].value == \'' . $code . '\') { document.checkout_payment.payment[i].checked = true; break; }}};"';
+
+		$content = '';
+		$first   = 100;
+		foreach ( $this->get_enabled_paymenttypes() as $payment ) {
+			if ( $first == 100 ) {
+				$content .= '</strong></td><td>';
+			}
+			$first ++;
+			$content .= '</td></tr></tbody></table><table border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffect(this, ' . $first . ')"><td>';
+			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right"><input type="radio" name="payment" value="' . strtolower( $payment['code'] ) . '" ' . $jsHelper . '>';
+		}
+
+		$content .= '</td></tr><tr style="display:none;">';
+
+		return $content;
+	}
 }

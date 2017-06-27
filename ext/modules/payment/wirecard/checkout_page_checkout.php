@@ -24,6 +24,7 @@
 
 chdir('../../../../');
 require('includes/application_top.php');
+require_once(DIR_FS_CATALOG.'ext/modules/payment/wirecard/checkout_page_payment_helper.php');
 require_once (DIR_FS_CATALOG.'includes/modules/payment/wirecard_checkout_page.php');
 
 // if the customer is not logged on, redirect them to the login page

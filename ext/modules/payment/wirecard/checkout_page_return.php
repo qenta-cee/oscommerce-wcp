@@ -23,6 +23,7 @@
 */
 
     chdir('../../../../');
+    require_once('ext/modules/payment/wirecard/checkout_page_payment_helper.php');
     require_once('includes/modules/payment/wirecard_checkout_page.php');
     require_once('includes/application_top.php');
     require_once ('includes/languages/'. $_SESSION["language"] .'/modules/payment/wirecard_checkout_page.php');
