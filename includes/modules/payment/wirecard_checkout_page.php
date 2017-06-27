@@ -137,12 +137,19 @@ class wirecard_checkout_page
 		return false;
 	}
 
+	/**
+     * Create radio buttons for enabled payment fields
+     *
+	 * @return array
+	 */
 	function selection() {
 
-		return array(
-			'id'     => $this->code,
-			'module' => $this->_payments->get_payment_selection( $this->code, $this->title )
-		);
+	    if ( count($this->_payments->get_enabled_paymenttypes()) ) {
+		    return array(
+			    'id'     => $this->code,
+			    'module' => $this->_payments->get_payment_selection( $this->code )
+		    );
+	    }
 	}
 
 	/**

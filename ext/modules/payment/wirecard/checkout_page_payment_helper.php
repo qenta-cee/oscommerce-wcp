@@ -91,24 +91,37 @@ class wirecard_checkout_page_payments {
 		return $payments;
 	}
 
-	public function get_payment_selection( $code, $title ) {
+	/**
+	 * Create radio buttons for payment methods and add payment fields
+	 *
+	 * @param $code
+	 *
+	 * @return string
+	 */
+	public function get_payment_selection( $code ) {
 		$content = '';
-		$first   = 0;
+		$count   = 0;
 		$content .= '<input id="wirecard_checkout_page_payment" type="hidden" name="wirecard_checkout_page" value="select">';
 
 		foreach ( $this->get_enabled_paymenttypes() as $payment ) {
-			if ( $first == 0) {
+			if ( $count == 0) {
 				$content .= '</strong></td><td>';
 			}
-			$first++;
+			$count++;
+			$id = "wirecard_payment_table_".$count;
 			$payment_code = strtolower($payment['code']);
 			$js_helper = "document.getElementById('wirecard_checkout_page_payment').value='".$payment_code."'";
-			$content .= '</td></tr></tbody></table><table border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr><td>';
+			$content .= '</td></tr></tbody></table><table id="'.$id.'" border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr><td>';
 			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right">'.
 			'<input type="radio" name="payment" value="' .$code. '" onclick='.$js_helper.'>';
 		}
 
 		$content .= '</td></tr><tr style="display:none;">';
+		$content .= '
+		<script type="text/javascript">
+				var checkoutTable = document.getElementById("wirecard_payment_table_1").previousElementSibling;
+				checkoutTable.style.display = "none";
+			</script>';
 
 		return $content;
 	}
