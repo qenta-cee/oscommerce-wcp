@@ -739,29 +739,28 @@ class wirecard_checkout_page
 
 	function install()
 	{
-
+		$configuration = "'tep_draw_pull_down_menu(\'configuration\', array(array(\'id\' => \'demo\', \'text\' => \'Demo\'), array(\'id\' => \'test\', \'text\' => \'Test\'), array(\'id\' => \'test3d\', \'text\' => \'Test3D\'), array(\'id\' => \'production\', \'text\' => \'Production\')), '";
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Wirecard Checkout Page Module', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS', 'True', 'Do you want to accept Wirecard Checkout Page payments?', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Configuration', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG', 'demo', '', '6', '0', $configuration, now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('CustomerId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID', '', 'Enter the customer id you received from Wirecard CEE.', '6', '1', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ShopId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID', '', 'Enter the shop id you received from Wirecard CEE.', '6', '2', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Secret', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET', '', 'Enter the secret string (preshared key) you received from Wirecard CEE for the fingerprint-hash', '6', '3', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('IFrame', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME', 'False', 'Open Wirecard Checkout Page inside an IFrame.', '6', '4', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Paysys-Text', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_TEXT', '', 'Enter the text which should be displayed as description for the payment type SELECT (e.g. MasterCard, Visa, ...)', '6', '6', now())");
 
 		$this->_payments->install_paymenttypes();
 
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ServiceUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL', '', 'Enter the URL to your contact page.', '6', '300', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ImageUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL', '', 'Enter the Url of the image which should be displayed during the payment process on the Wirecard Checkout Page.', '6', '301', now())");
 
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Invoice min. amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT', '100', 'Enter minimum amount for invoice. (&euro;)', '6', '310', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Invoice max. amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT', '10000', 'Enter maximum amount for invoice. (&euro;)', '6', '311', now())");
-
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Installment min. amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT', '100', 'Enter maximum amount for installment. (&euro;)','6', '320', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Installmen max. amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT', '10000', 'Enter maximum amount for installment. (&euro;)','6', '321', now())");
-
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first', '6', '400', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Payment Zone', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ZONE', '0', 'If a zone is selected, only enable this payment method for that zone', '6', '410', 'tep_get_zone_class_title', 'tep_cfg_pull_down_zone_classes(', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ORDER_STATUS_ID', '0', 'Set the status of orders made with this payment module to this value.', '6', '420', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, use_function, date_added) values ('Set Order Status Pending', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ORDER_STATUS_PENDING_ID', '0', 'Set the status of orders made with this payment module, which are in paymentstate pending.', '6', '430', 'tep_cfg_pull_down_order_statuses(', 'tep_get_order_status_name', now())");
+
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Forward basket data', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET', 'False', 'Forwarding basket data to the respective financial service provider.', '6', '601', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Forward consumer shipping data', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING', 'False', 'Forwarding shipping data about your consumer to the respective financial service provider.', '6', '602', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Forward consumer billing data', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING', 'False', 'Forwarding billing data about your consumer to the respective financial service provider.', '6', '603', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
+		$this->_payments->install_invoice_installment_settings();
 
 		tep_db_query("CREATE TABLE IF NOT EXISTS `" . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TRANSACTION_TABLE . "` (
                         `TRID` varchar(255) NOT NULL default '',
@@ -814,22 +813,39 @@ class wirecard_checkout_page
 	function keys()
 	{
 		$keys = array('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME',
-			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT',
-			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT',
-			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT',
-			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ORDER_STATUS_ID',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ORDER_STATUS_PENDING_ID',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ZONE',
 		);
-		return array_merge($keys, $this->_payments->get_paymenttypes_code());
+		$invoice_installment = array(
+            'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID',
+            'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT',
+        );
+		$keys = array_merge($keys, $this->_payments->get_paymenttypes_code());
+		return array_merge($keys, $invoice_installment);
 	}
 
 	// Parse the predefinied array to be 'module install' friendly

@@ -61,6 +61,59 @@ class wirecard_checkout_page_payments {
 	}
 
 	/**
+	 * Insert invoice and installment configuration settings
+	 */
+	public function install_invoice_installment_settings() {
+		$invoice_provider = "'tep_draw_pull_down_menu(\'inv_provider\', array(array(\'id\' => \'payolution\', \'text\' => \'payolution\'), array(\'id\' => \'ratepay\', \'text\' => \'RatePay\'), array(\'id\' => \'ratepay\', \'text\' => \'Wirecard\')), '";
+		$installment_provider = "'tep_draw_pull_down_menu(\'inst_provider\', array(array(\'id\' => \'payolution\', \'text\' => \'payolution\'), array(\'id\' => \'ratepay\', \'text\' => \'RatePay\')), '";
+
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
+		             values ('payolution terms', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS', 'False', '', '6', '500', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('payolution mID', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID', '', '', '6', '501', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
+		             values ('Invoice provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER', 'payolution', '', '6', '502', $invoice_provider , now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
+		             values ('Invoice billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING', 'False', '', '6', '503', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Allowed countries for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '504', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Allowed currencies for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES', '', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '505', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Invoice minimum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT', '10', '', '6', '506', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Invoice maximum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT', '3500', '', '6', '507', now())");
+
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
+		             values ('Installment provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER', 'payolution', '', '6', '550', $installment_provider , now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
+		             values ('Installment billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING', 'False', '', '6', '551', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Allowed countries for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '552', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Allowed currencies for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES', '', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '553', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Installment minimum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT', '150', '','6', '551', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION .
+		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
+		             values ('Installment maximum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT', '3500', '','6', '553', now())");
+
+	}
+
+	/**
 	 * Returns paymenttype codes
 	 *
 	 * @return array
