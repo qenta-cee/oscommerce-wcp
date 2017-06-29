@@ -264,6 +264,13 @@ class wirecard_checkout_page
         $consumerData = $this->create_consumer_data($paymentType);
 		$postData = array_merge($postData, $consumerData);
 
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET == 'True' ||
+		     ( $paymentType == 'Invoice' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER != 'payolution' ) ||
+		     ( $paymentType == 'Installment' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER != 'payolution' )
+		) {
+			$postData = array_merge( $postData, $this->create_basket_data() );
+		}
+
 		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME == 'True') {
 			$postData['windowName'] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME;
 		}
@@ -386,6 +393,49 @@ class wirecard_checkout_page
 			$consumerData = array_merge($consumerData, $billingData);
 		}
 		return $consumerData;
+    }
+
+	/**
+     * Returns basket including products and shipping
+     *
+	 * @return array
+	 */
+    function create_basket_data() {
+	    global $order;
+	    $basket_prefix = 'basketItem';
+	    $basket = array();
+	    $count = 0;
+	    $tax = 0;
+	    print_r($order);
+
+	    foreach ($order->products as $product) {
+	        $count++;
+		    $tax_amount = tep_calculate_tax($product['price'], $product['tax']);
+		    $tax += $tax_amount;
+		    $basket[$basket_prefix . $count .'articleNumber'] = $product['model'];
+		    $basket[$basket_prefix . $count .'unitGrossAmount'] = tep_round($product['price'], 2);
+		    $basket[$basket_prefix . $count .'unitNetAmount'] = tep_round($product['price'] - $tax_amount, 2);
+		    $basket[$basket_prefix . $count .'unitTaxAmount'] = tep_round($tax_amount, 2);
+		    $basket[$basket_prefix . $count .'unitTaxRate'] = $product['tax'];
+		    $basket[$basket_prefix . $count .'description'] = $product['name'];
+		    $basket[$basket_prefix . $count .'name'] = $product['name'];
+		    $basket[$basket_prefix . $count .'quantity'] = $product['qty'];
+        }
+
+	    if (isset($order->info['shipping_method'])) {
+		    $count++;
+		    $basket[$basket_prefix .$count .'articleNumber'] = 'shipping';
+		    $basket[$basket_prefix .$count .'unitGrossAmount'] =  tep_round($order->info['shipping_cost'], 2);
+		    $basket[$basket_prefix .$count .'unitNetAmount'] =  tep_round($order->info['shipping_cost'], 2);
+		    $basket[$basket_prefix .$count .'unitTaxRate'] = 0;
+		    $basket[$basket_prefix .$count .'unitTaxAmount'] = 0;
+		    $basket[$basket_prefix .$count .'name'] = $order->info['shipping_method'];
+		    $basket[$basket_prefix .$count .'description'] = $order->info['shipping_method'];
+		    $basket[$basket_prefix .$count .'quantity'] = 1;
+	    }
+	    $basket['basketItems'] = $count;
+
+	    return $basket;
     }
 
 	/**
