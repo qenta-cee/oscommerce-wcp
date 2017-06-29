@@ -225,75 +225,20 @@ class wirecard_checkout_page
 	{
 		global $order, $order_total_modules, $currencies, $currency, $languages_id;
 
-		$qLanguage = $this->getLanguageCode($languages_id);
-
-		$qCurrency = $order->info['currency'];
-
 		$this->transaction_id = $this->generate_trid();
-
-		// construct the orderDescription -> displayed within QENTA Payment Center
-		// substitute some special characters
-		$orderDescription = $this->transaction_id . ' - ' .
-		                    $order->customer['firstname'] . ' ' .
-		                    $order->customer['lastname'];
-
-		// construct the amount value
-		$amount = tep_round($order->info['total'] * $currencies->get_value($qCurrency), 2);
 
 		// construct the returnUrl. we will use one url for all types of return (success, pending, cancel, failure)
 		// FILENAME_CHECKOUT_PROCESS
 		$returnUrl = tep_href_link(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_RETURN, '', 'SSL');
 		$confirmUrl = tep_href_link(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIRM, '', 'SSL');
 
-		// construct the real payment type. if subtype is submittet via post, we have to use them
+
 		$paymentType = (isset($_POST["wirecard_checkout_page"]) && tep_not_null($_POST["wirecard_checkout_page"])) ? $_POST["wirecard_checkout_page"] : "SELECT";
-
-		//add Versions of Plugin and Shop for update notifications.
+		$qLanguage = $this->getLanguageCode($languages_id);
+		$qCurrency = $order->info['currency'];
+		$this->transaction_id = $this->generate_trid();
+		$amount = tep_round($order->info['total'] * $currencies->get_value($qCurrency), 2);
 		$pluginVersion = base64_encode('osCommerce; ' . PROJECT_VERSION . '; ; osCommerce; ' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PLUGINVERSION);
-
-		//add consumerInformation for address verification.
-		if (tep_session_is_registered('customer_id'))
-		{
-			$consumerID = $_SESSION['customer_id'];
-		}
-		else
-		{
-			$consumerID = '';
-		}
-		$deliveryInformation = $order->delivery;
-
-		if ($deliveryInformation['country']['iso_code_2'] == 'US' || $deliveryInformation['country']['iso_code_2'] == 'CA')
-		{
-			$deliveryState = $this->_getZoneCodeByName($deliveryInformation['state']);
-		}
-		else
-		{
-			$deliveryState = tep_get_zone_code($deliveryInformation['country']['id'], $deliveryInformation['zone_id'], '');
-		}
-
-		$billingInformation = $order->billing;
-		if ($billingInformation['country']['iso_code_2'] == 'US' || $billingInformation['country']['iso_code_2'] == 'CA')
-		{
-			$billingState = $this->_getZoneCodeByName($billingInformation['state']);
-		}
-		else
-		{
-			$billingState = tep_get_zone_code($billingInformation['country']['id'], $billingInformation['zone_id'], '');
-		}
-
-
-		$sql = 'SELECT customers_dob, customers_fax FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id="' . $consumerID . '" LIMIT 1;';
-		$result = tep_db_query($sql);
-		$consumerInformation = $result->fetch_assoc();
-		if ($consumerInformation['customers_dob'] != '0000-00-00 00:00:00')
-		{
-			$consumerBirthDateTimestamp = strtotime($consumerInformation['customers_dob']);
-			$consumerBirthDate = date('Y-m-d', $consumerBirthDateTimestamp);
-		}
-		else
-		{
-			$consumerBirthDate = '';
-		}
 
 		$config = $this->_config->get_client_config($qLanguage);
 
@@ -304,7 +249,7 @@ class wirecard_checkout_page
 		                  'paymentType' => $paymentType,
 		                  'currency' => $qCurrency,
 		                  'language' => $qLanguage,
-		                  'orderDescription' => $orderDescription,
+		                  'orderDescription' => $this->get_order_description(),
 		                  'displayText' => $this->displaytext,
 		                  'successURL' => $returnUrl,
 		                  'failureURL' => $returnUrl,
@@ -314,30 +259,14 @@ class wirecard_checkout_page
 		                  'serviceURL' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL,
 		                  'trid' => $this->transaction_id,
 		                  'pluginVersion' => $pluginVersion,
-		                  'consumerShippingFirstName' => $deliveryInformation['firstname'],
-		                  'consumerShippingLastName' => $deliveryInformation['lastname'],
-		                  'consumerShippingAddress1' => $deliveryInformation['street_address'],
-		                  'consumerShippingAddress2' => $deliveryInformation['suburb'],
-		                  'consumerShippingCity' => $deliveryInformation['city'],
-		                  'consumerShippingZipCode' => $deliveryInformation['postcode'],
-		                  'consumerShippingState' => $deliveryState,
-		                  'consumerShippingCountry' => $deliveryInformation['country']['iso_code_2'],
-		                  'consumerShippingPhone' => $order->customer['telephone'],
-		                  'consumerBillingFirstName' => $billingInformation['firstname'],
-		                  'consumerBillingLastName' => $billingInformation['lastname'],
-		                  'consumerBillingAddress1' => $billingInformation['street_address'],
-		                  'consumerBillingAddress2' => $billingInformation['suburb'],
-		                  'consumerBillingCity' => $billingInformation['city'],
-		                  'consumerBillingZipCode' => $billingInformation['postcode'],
-		                  'consumerBillingState' => $billingState,
-		                  'consumerBillingCountry' => $billingInformation['country']['iso_code_2'],
-		                  'consumerBillingPhone' => $order->customer['telephone'],
-		                  'consumerEmail' => $order->customer['email_address'],
-		                  'consumerBirthDate' => $consumerBirthDate,
 		                  'consumerMerchantCrmId' => md5($order->customer['email_address']));
 
-		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME == 'True')
+        $consumerData = $this->create_consumer_data($paymentType);
+		$postData = array_merge($postData, $consumerData);
+
+		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME == 'True') {
 			$postData['windowName'] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME;
+		}
 
 		$requestFingerprintOrder = 'secret';
 		$tempArray = array('secret' => $this->_config->get_client_secret());
@@ -379,9 +308,93 @@ class wirecard_checkout_page
 
 	}
 
+	/**
+     * Creates consumer data according to config settings
+     *
+	 * @param $paymentType
+	 *
+	 * @return array consumerData
+	 */
+	function create_consumer_data($paymentType) {
+		global $order;
+
+		$consumerID = '';
+		$consumerData = array();
+		$consumerData['IpAddress'] = $_SERVER['REMOTE_ADDR'];
+		$consumerData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
+
+		if (tep_session_is_registered('customer_id'))
+		{
+			$consumerID = $_SESSION['customer_id'];
+		}
+
+		$sql = 'SELECT customers_dob, customers_fax FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id="' . $consumerID . '" LIMIT 1;';
+		$result = tep_db_query($sql);
+		$consumerInformation = $result->fetch_assoc();
+		if ($consumerInformation['customers_dob'] != '0000-00-00 00:00:00')
+		{
+			$consumerBirthDateTimestamp = strtotime($consumerInformation['customers_dob']);
+			$consumerBirthDate = date('Y-m-d', $consumerBirthDateTimestamp);
+			$consumerData['consumerBirthDate'] = $consumerBirthDate;
+		}
+
+		$consumerData['consumerEmail'] = $order->customer['email_address'];
+
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING == 'True' || $paymentType == 'Invoice' || $paymentType == 'Installment' ) {
+			$deliveryInformation = $order->delivery;
+
+			if ($deliveryInformation['country']['iso_code_2'] == 'US' || $deliveryInformation['country']['iso_code_2'] == 'CA')
+			{
+				$deliveryState = $this->_getZoneCodeByName($deliveryInformation['state']);
+			}
+			else
+			{
+				$deliveryState = tep_get_zone_code($deliveryInformation['country']['id'], $deliveryInformation['zone_id'], '');
+			}
+			$shippingData = Array(
+				'consumerShippingFirstName' => $deliveryInformation['firstname'],
+				'consumerShippingLastName' => $deliveryInformation['lastname'],
+				'consumerShippingAddress1' => $deliveryInformation['street_address'],
+				'consumerShippingAddress2' => $deliveryInformation['suburb'],
+				'consumerShippingCity' => $deliveryInformation['city'],
+				'consumerShippingZipCode' => $deliveryInformation['postcode'],
+				'consumerShippingState' => $deliveryState,
+				'consumerShippingCountry' => $deliveryInformation['country']['iso_code_2'],
+				'consumerShippingPhone' => $order->customer['telephone']);
+			$consumerData = array_merge($consumerData, $shippingData);
+        }
+
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING == 'True'  || $paymentType == 'Invoice' || $paymentType == 'Installment' ) {
+			$billingInformation = $order->billing;
+			if ( $billingInformation['country']['iso_code_2'] == 'US' || $billingInformation['country']['iso_code_2'] == 'CA' ) {
+				$billingState = $this->_getZoneCodeByName( $billingInformation['state'] );
+			} else {
+				$billingState = tep_get_zone_code( $billingInformation['country']['id'], $billingInformation['zone_id'],
+					'' );
+			}
+			$billingData = Array(
+				'consumerBillingFirstName' => $billingInformation['firstname'],
+				'consumerBillingLastName'  => $billingInformation['lastname'],
+				'consumerBillingAddress1'  => $billingInformation['street_address'],
+				'consumerBillingAddress2'  => $billingInformation['suburb'],
+				'consumerBillingCity'      => $billingInformation['city'],
+				'consumerBillingZipCode'   => $billingInformation['postcode'],
+				'consumerBillingState'     => $billingState,
+				'consumerBillingCountry'   => $billingInformation['country']['iso_code_2'],
+				'consumerBillingPhone'     => $order->customer['telephone']
+			);
+			$consumerData = array_merge($consumerData, $billingData);
+		}
+		return $consumerData;
+    }
+
+	/**
+     * Get order description
+     *
+	 * @return string
+	 */
 	function get_order_description(){
 		global $order;
-		$this->transaction_id = $this->generate_trid();
 		$orderDescription = $this->transaction_id . ' - ' .
 		                    $order->customer['firstname'] . ' ' .
 		                    $order->customer['lastname'];
