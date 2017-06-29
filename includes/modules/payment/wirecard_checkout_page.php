@@ -22,9 +22,11 @@ disadvantage related to the use of this plugin. By installing the plugin
 into the shopsystem the customer agrees to the terms of use. Please do
 not use this plugin if you do not agree to the terms of use!
  */
-
 if (!class_exists('wirecard_checkout_page_payments')) {
 	require_once( DIR_FS_CATALOG . 'ext/modules/payment/wirecard/checkout_page_payment_helper.php' );
+}
+if (!class_exists('wirecard_checkout_page_configuration')) {
+	require_once( DIR_FS_CATALOG . 'ext/modules/payment/wirecard/checkout_page_configuration_helper.php' );
 }
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INITIATION_URL', 'https://checkout.wirecard.com/page/init.php');
@@ -44,6 +46,7 @@ class wirecard_checkout_page
 	var $code, $title, $description, $enabled, $transaction_id, $displaytext;
 
 	protected $_payments;
+	protected $_config;
 
 	/**
 	 * constructor
@@ -58,6 +61,7 @@ class wirecard_checkout_page
 		$this->displaytext = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TEXT_DISPLAYTEXT;
 		$this->sort_order = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER;
 		$this->_payments = new wirecard_checkout_page_payments();
+		$this->_config = new wirecard_checkout_page_configuration();
 		//$this->enabled = count( $this->_payments->get_enabled_paymenttypes() ) > 0 ? "yes" : "no";
 		$this->enabled =  ((MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS == 'True') ? true : false);
 
@@ -291,9 +295,10 @@ class wirecard_checkout_page
 			$consumerBirthDate = '';
 		}
 
+		$config = $this->_config->get_client_config($qLanguage);
 
-		$postData = Array('customerId' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID,
-		                  'shopId' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID,
+		$postData = Array('customerId' => $config['CUSTOMER_ID'],
+		                  'shopId' => $config['SHOP_ID'],
 		                  'imageURL' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL,
 		                  'amount' => $amount,
 		                  'paymentType' => $paymentType,
@@ -335,7 +340,7 @@ class wirecard_checkout_page
 			$postData['windowName'] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME;
 
 		$requestFingerprintOrder = 'secret';
-		$tempArray = array('secret' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+		$tempArray = array('secret' => $this->_config->get_client_secret());
 		foreach ($postData AS $parameterName => $parameterValue) {
 			$requestFingerprintOrder .= ',' . $parameterName;
 			$tempArray[(string)$parameterName] = (string)$parameterValue;
@@ -343,7 +348,7 @@ class wirecard_checkout_page
 		$requestFingerprintOrder .= ',requestFingerprintOrder';
 		$tempArray['requestFingerprintOrder'] = $requestFingerprintOrder;
 
-		$hash = hash_init('sha512', HASH_HMAC, MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+		$hash = hash_init('sha512', HASH_HMAC, $this->_config->get_client_secret());
 		foreach ($tempArray as $key => $value) {
 			hash_update($hash, $value);
 		}
@@ -373,6 +378,15 @@ class wirecard_checkout_page
 		}
 
 	}
+
+	function get_order_description(){
+		global $order;
+		$this->transaction_id = $this->generate_trid();
+		$orderDescription = $this->transaction_id . ' - ' .
+		                    $order->customer['firstname'] . ' ' .
+		                    $order->customer['lastname'];
+		return $orderDescription;
+    }
 
 	function before_process()
 	{
@@ -671,7 +685,7 @@ class wirecard_checkout_page
 
 			if (strcmp($key, 'secret') == 0)
 			{
-				$tempArray[(string)$key] = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET;
+				$tempArray[(string)$key] = $this->_config->get_client_secret();
 				$secretUsed = 1;
 			}
 			else
@@ -680,7 +694,7 @@ class wirecard_checkout_page
 			}
 		}
 
-		$hash = hash_init('sha512', HASH_HMAC, MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET);
+		$hash = hash_init('sha512', HASH_HMAC, $this->_config->get_client_secret());
 
 		foreach ($tempArray as $key => $value) {
 			hash_update($hash, $value);
