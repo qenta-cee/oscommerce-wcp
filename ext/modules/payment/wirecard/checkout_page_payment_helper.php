@@ -94,6 +94,59 @@ class wirecard_checkout_page_payments {
 	);
 
 	/**
+	 * Pre check for Invoice (currencies, countries, amount)
+	 *
+	 * @return bool
+	 */
+	protected function preInvoiceCheck()
+	{
+		global $order, $currencies;
+
+		$currency = $order->info['currency'];
+		$total = $order->info['total'];
+		$amount = $total;
+
+		$currencies = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES);
+		$countries = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES);
+		$country_code = $order->billing['country']['iso_code_2'];
+
+		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING == "True" && $order->delivery ==! $order->billing){
+			return false;
+		}
+
+		return (($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT) &&
+		        ( in_array($currency, $currencies) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES) ) &&
+		        (in_array($country_code, $countries) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES)));
+
+	}
+
+	/**
+	 * Pre check for Installment (currencies, countries, amount)
+	 *
+	 * @return bool
+	 */
+	protected function preInstallmentCheck()
+	{
+		global $order, $currencies;
+
+		$currency = $order->info['currency'];
+		$total = $order->info['total'];
+		$amount = $total;
+
+		$currencies = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES);
+		$countries = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES);
+		$country_code = $order->billing['country']['iso_code_2'];
+
+		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING == "True" && $order->delivery ==! $order->billing){
+			return false;
+		}
+
+		return (($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT) &&
+		        ( in_array($currency, $currencies) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES) ) &&
+		        (in_array($country_code, $countries) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES)));
+
+	}
+	/**
 	 * Get paymenttype array
 	 *
 	 * @return array
@@ -192,6 +245,16 @@ class wirecard_checkout_page_payments {
 	public function get_enabled_paymenttypes() {
 		$payments = array();
 		foreach ($this->get_paymenttypes() as $payment) {
+			if ($payment['code'] == 'INVOICE'){
+				if ( ! $this->preInvoiceCheck()) {
+					continue;
+				};
+			}
+			if ($payment['code'] == 'INSTALLMENT'){
+				if ( ! $this->preInstallmentCheck()) {
+					continue;
+				};
+			}
 			$module = "'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_".$payment['code']."'";
 			$query = tep_db_query("select configuration_value from " .TABLE_CONFIGURATION . " where configuration_key=".$module);
 			$result = tep_db_fetch_array($query);

@@ -62,7 +62,6 @@ class wirecard_checkout_page
 		$this->sort_order = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER;
 		$this->_payments = new wirecard_checkout_page_payments();
 		$this->_config = new wirecard_checkout_page_configuration();
-		//$this->enabled = count( $this->_payments->get_enabled_paymenttypes() ) > 0 ? "yes" : "no";
 		$this->enabled =  ((MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS == 'True') ? true : false);
 
 		$this->transaction_id = '';
@@ -154,61 +153,6 @@ class wirecard_checkout_page
 			    'module' => $this->_payments->get_payment_selection( $this->code )
 		    );
 	    }
-	}
-
-	/**
-	 * @return bool
-	 */
-	function _preInvoiceCheck()
-	{
-		global $order, $customer, $currencies;
-
-		$consumerID = tep_session_is_registered('customer_id') ? $_SESSION['customer_id'] : "";
-
-		$currency = $order->info['currency'];
-		$total = $order->info['total'];
-		$amount = tep_round($total * $currencies->get_value($currency), 2);
-
-		$sql = 'SELECT (COUNT(*) > 0) as cnt FROM ' . TABLE_CUSTOMERS . ' WHERE DATEDIFF(NOW(), customers_dob) > 6574 AND customers_id="' . $consumerID . '"';
-
-		$result = tep_db_query($sql)->fetch_assoc();
-
-		$ageCheck = (bool)$result['cnt'];
-		$country_code = $order->billing['country']['iso_code_2'];
-
-		return ($ageCheck &&
-		        ($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT) &&
-		        ($currency == 'EUR') &&
-		        (in_array($country_code, Array('AT', 'DE', 'CH'))) &&
-		        ($order->delivery === $order->billing));
-
-	}
-
-	/**
-	 * @return bool
-	 */
-	function _preInstallmentCheck()
-	{
-		global $order, $customer, $currencies;
-
-		$consumerID = tep_session_is_registered('customer_id') ? $_SESSION['customer_id'] : "";
-
-		$currency = $order->info['currency'];
-		$total = $order->info['total'];
-		$amount = tep_round($total * $currencies->get_value($currency), 2);
-
-		$sql = 'SELECT (COUNT(*) > 0) as cnt FROM ' . TABLE_CUSTOMERS . ' WHERE DATEDIFF(NOW(), customers_dob) > 6574 AND customers_id="' . $consumerID . '"';
-		$result = tep_db_query($sql)->fetch_assoc();
-
-		$ageCheck = (bool)$result['cnt'];
-		$country_code = $order->billing['country']['iso_code_2'];
-
-		return ($ageCheck &&
-		        ($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT) &&
-		        ($currency == 'EUR') &&
-		        (in_array($country_code, Array('AT', 'DE', 'CH'))) &&
-		        ($order->delivery === $order->billing));
-
 	}
 
 	function pre_confirmation_check()
