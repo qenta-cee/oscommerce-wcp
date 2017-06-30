@@ -36,6 +36,64 @@ class wirecard_checkout_page_payments {
 	);
 
 	/**
+	 * eps financial institutions
+	 *
+	 * @var array
+	 */
+	protected static $_eps_financial_institutions = Array(
+		Array( 'id' => 'ARZ|AB', 'text' => 'Apothekerbank'),
+		Array( 'id' => 'ARZ|AAB', 'text' => 'Austrian Anadi Bank AG'),
+		Array( 'id' => 'ARZ|BAF', 'text' => '&Auml;rztebank'),
+		Array( 'id' => 'BA-CA', 'text' => 'Bank Austria'),
+		Array( 'id' => 'ARZ|BCS', 'text' => 'Bankhaus Carl Sp&auml;ngler & Co. AG'),
+		Array( 'id' => 'ARZ|BSS', 'text' => 'Bankhaus Schelhammer & Schattera AG'),
+		Array( 'id' => 'Bawag|BG', 'text' => 'BAWAG P.S.K. AG'),
+		Array( 'id' => 'ARZ|BKS', 'text' => 'BKS Bank AG'),
+		Array( 'id' => 'ARZ|BKB', 'text' => 'Br&uuml;ll Kallmus Bank AG'),
+		Array( 'id' => 'ARZ|BTV', 'text' => 'BTV VIER L&Auml;NDER BANK'),
+		Array( 'id' => 'ARZ|CBGG', 'text' => 'Capital Bank Grawe Gruppe AG'),
+		Array( 'id' => 'ARZ|VB', 'text' => 'Volksbank Gruppe'),
+		Array( 'id' => 'ARZ|DB', 'text' => 'Dolomitenbank'),
+		Array( 'id' => 'Bawag|EB', 'text' => 'Easybank AG'),
+		Array( 'id' => 'Spardat|EBS', 'text' => 'Erste Bank und Sparkassen'),
+		Array( 'id' => 'ARZ|HAA', 'text' => 'Hypo Alpe-Adria-Bank International AG'),
+		Array( 'id' => 'ARZ|VLH', 'text' => 'Hypo Landesbank Vorarlberg'),
+		Array( 'id' => 'ARZ|HI', 'text' => 'HYPO NOE Gruppe Bank AG'),
+		Array( 'id' => 'ARZ|NLH', 'text' => 'HYPO NOE Landesbank AG'),
+		Array( 'id' => 'Hypo-Racon|O', 'text' => 'Hypo Ober&ouml;sterreich'),
+		Array( 'id' => 'Hypo-Racon|S', 'text' => 'Hypo Salzburg'),
+		Array( 'id' => 'Hypo-Racon|St', 'text' => 'Hypo Steiermark'),
+		Array( 'id' => 'ARZ|HTB', 'text' => 'Hypo Tirol Bank AG'),
+		Array( 'id' => 'BB-Racon', 'text' => 'HYPO-BANK BURGENLAND Aktiengesellschaft'),
+		Array( 'id' => 'ARZ|IB', 'text' => 'Immo-Bank'),
+		Array( 'id' => 'ARZ|OB', 'text' => 'Oberbank AG'),
+		Array( 'id' => 'Racon', 'text' => 'Raiffeisen Bankengruppe &Ouml;sterreich'),
+		Array( 'id' => 'ARZ|SB', 'text' => 'Schoellerbank AG'),
+		Array( 'id' => 'Bawag|SBW', 'text' => 'Sparda Bank Wien'),
+		Array( 'id' => 'ARZ|SBA', 'text' => 'SPARDA-BANK AUSTRIA'),
+		Array( 'id' => 'ARZ|VKB', 'text' => 'Volkskreditbank AG'),
+		Array( 'id' => 'ARZ|VRB', 'text' => 'VR-Bank Braunau')
+	);
+
+	/**
+	 * idl financial institutions
+	 *
+	 * @var array
+	 */
+	protected static $_idl_financial_institutions = Array(
+		Array( 'id' => 'ABNAMROBANK', 'text' => 'ABN AMRO Bank'),
+		Array( 'id' => 'ASNBANK', 'text' => 'ASN Bank'),
+		Array( 'id' => 'BUNQ', 'text' => 'Bunq Bank'),
+		Array( 'id' => 'INGBANK', 'text' => 'ING'),
+		Array( 'id' => 'KNAB', 'text' => 'knab'),
+		Array( 'id' => 'RABOBANK', 'text' => 'Rabobank'),
+		Array( 'id' => 'SNSBANK', 'text' => 'SNS Bank'),
+		Array( 'id' => 'REGIOBANK', 'text' => 'RegioBank'),
+		Array( 'id' => 'TRIODOSBANK', 'text' => 'Triodos Bank'),
+		Array( 'id' => 'VANLANSCHOT', 'text' => 'Van Lanschot Bankiers')
+	);
+
+	/**
 	 * Get paymenttype array
 	 *
 	 * @return array
@@ -64,8 +122,8 @@ class wirecard_checkout_page_payments {
 	 * Insert invoice and installment configuration settings
 	 */
 	public function install_invoice_installment_settings() {
-		$invoice_provider = "'tep_draw_pull_down_menu(\'inv_provider\', array(array(\'id\' => \'payolution\', \'text\' => \'payolution\'), array(\'id\' => \'ratepay\', \'text\' => \'RatePay\'), array(\'id\' => \'ratepay\', \'text\' => \'Wirecard\')), '";
-		$installment_provider = "'tep_draw_pull_down_menu(\'inst_provider\', array(array(\'id\' => \'payolution\', \'text\' => \'payolution\'), array(\'id\' => \'ratepay\', \'text\' => \'RatePay\')), '";
+		$invoice_provider = "'tep_cfg_select_option(array(\'payolution\', \'RatePay\', \'Wirecard\'), '";
+		$installment_provider = "'tep_cfg_select_option(array(\'payolution\', \'RatePay\'), '";
 
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
@@ -177,5 +235,23 @@ class wirecard_checkout_page_payments {
 			</script>';
 
 		return $content;
+	}
+
+	/**
+	 * Get array of eps financial institutions
+	 *
+	 * @return array
+	 */
+	public function get_eps_financial_institutions() {
+		return self::$_eps_financial_institutions;
+	}
+
+	/**
+	 * Get array of idl financial institutions
+	 *
+	 * @return array
+	 */
+	public function get_idl_financial_institutions() {
+		return self::$_idl_financial_institutions;
 	}
 }

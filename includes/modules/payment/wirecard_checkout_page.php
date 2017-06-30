@@ -216,9 +216,97 @@ class wirecard_checkout_page
 		return false;
 	}
 
+	/**
+     * Prints fields before confirmation
+     *
+	 * @return array
+	 */
 	function confirmation()
 	{
-		return false;
+		$paymentType= $_POST['wirecard_checkout_page'];
+
+		$fields = array();
+		switch ( $paymentType ) {
+			case 'installment':
+				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
+				$today         = date( 'Y' ) . "-" . date( 'm' ) . "-" . date( 'd' );
+				$birthday      = '<input type="date" name="wcp_birthday" value="' . $today . '" max="' . $maxDate . '" class="form-control" />';
+				$birthDayField = array(
+					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
+					'field' => $birthday
+				);
+
+				array_push( $fields, $birthDayField );
+				array_push( $fields, array( 'title' => '', 'field' => '<br/>' ) );
+
+				$terms    = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS;
+				$mId      = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID;
+				$provider = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER;
+
+				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms"/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
+				if ( strlen( $mId ) ) {
+					$payolutionTerms .= '<a id="wcp-payolutionlink" href="https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=' . $mId . '" target="_blank"><b>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK . '</b></a>';
+				} else {
+					$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK;
+				}
+				$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2 . '</span>';
+
+				if ( $terms && $provider == 'payolution') {
+					array_push( $fields, array(
+						'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS,
+						'field' => $payolutionTerms
+					) );
+				}
+				break;
+			case 'invoice':
+				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
+				$today         = date( 'Y' ) . "-" . date( 'm' ) . "-" . date( 'd' );
+				$birthday      = '<input type="date" name="wcp_birthday" value="' . $today . '" max="' . $maxDate . '" class="form-control" />';
+				$birthDayField = array(
+					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
+					'field' => $birthday
+				);
+
+				array_push( $fields, $birthDayField );
+				array_push( $fields, array( 'title' => '', 'field' => '<br/>' ) );
+
+				$terms    = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS;
+				$mId      = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID;
+
+				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms"/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
+				if ( strlen( $mId ) ) {
+					$payolutionTerms .= '<a id="wcp-payolutionlink" href="https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=' . $mId . '" target="_blank"><b>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK . '</b></a>';
+				} else {
+					$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK;
+				}
+				$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2 . '</span>';
+
+				if ( $terms && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER == 'payolution') {
+					array_push( $fields, array(
+						'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS,
+						'field' => $payolutionTerms
+					) );
+				}
+				break;
+			case 'eps':
+			    $institutions = $this->_payments->get_eps_financial_institutions();
+				$institution_field = tep_draw_pull_down_menu("wcp_financial_institution", $institutions, '', 'class="form-control"');
+				$field = array('title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION, 'field' => $institution_field);
+
+				array_push($fields, $field);
+				break;
+			case 'idl':
+				$institutions = $this->_payments->get_idl_financial_institutions();
+				$institution_field = tep_draw_pull_down_menu("wcp_financial_institution", $institutions, '', 'class="form-control"');
+				$field = array('title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION, 'field' => $institution_field);
+
+				array_push($fields, $field);
+				break;
+            default:
+                break;
+		}
+
+		return array('fields' => $fields);
 	}
 
 	function process_button()
