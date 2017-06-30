@@ -43,7 +43,7 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME', 'wirecardCheckoutPag
 
 class wirecard_checkout_page
 {
-	var $code, $title, $description, $enabled, $transaction_id, $displaytext;
+	var $code, $title, $description, $enabled, $transaction_id;
 
 	protected $_payments;
 	protected $_config;
@@ -58,7 +58,6 @@ class wirecard_checkout_page
 		$this->code = 'wirecard_checkout_page';
 		$this->title = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TEXT_TITLE;
 		$this->description = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TEXT_DESCRIPTION;
-		$this->displaytext = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TEXT_DISPLAYTEXT;
 		$this->sort_order = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER;
 		$this->_payments = new wirecard_checkout_page_payments();
 		$this->_config = new wirecard_checkout_page_configuration();
@@ -294,7 +293,8 @@ class wirecard_checkout_page
 		                  'currency' => $qCurrency,
 		                  'language' => $qLanguage,
 		                  'orderDescription' => $this->get_order_description(),
-		                  'displayText' => $this->displaytext,
+		                  'orderReference' => $this->get_order_reference(),
+		                  'customerStatement' => $this->get_customer_statement($paymentType),
 		                  'successURL' => $returnUrl,
 		                  'failureURL' => $returnUrl,
 		                  'cancelURL' => $returnUrl,
@@ -307,9 +307,12 @@ class wirecard_checkout_page
 		                  'displayText' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT,
 		                  'consumerMerchantCrmId' => md5($order->customer['email_address']));
 
-		if ( ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT == 'True' ) ) {
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT == 'True' ) {
 			$postData['autoDeposit'] = true;
 		}
+		if ( $paymentType == 'masterpass' ) {
+			$postData['shippingProfile'] = 'NO_SHIPPING';
+        }
         $consumerData = $this->create_consumer_data($paymentType);
 		$postData = array_merge($postData, $consumerData);
 
@@ -493,11 +496,33 @@ class wirecard_checkout_page
 	 */
 	function get_order_description(){
 		global $order;
-		$orderDescription = $this->transaction_id . ' - ' .
-		                    $order->customer['firstname'] . ' ' .
-		                    $order->customer['lastname'];
-		return $orderDescription;
+		return sprintf('%s %s %s', $order->customer['email_address'], $order->customer['firstname'], $order->customer['lastname']);
     }
+
+	/**
+     * Get order reference
+     *
+	 * @return string
+	 */
+	function get_order_reference() {
+		return sprintf( '%010s', substr( $this->transaction_id, - 10 ) );
+	}
+
+	/**
+     * create customerStatement
+     *
+	 * @param $payment_type
+	 *
+	 * @return string
+	 */
+	function get_customer_statement( $payment_type ) {
+		$shop_name = sprintf( '%9s', substr( STORE_NAME, - 9 ) );
+		$order_reference = $this->get_order_reference();
+		if ( $payment_type == 'poli' ) {
+			return $shop_name;
+		}
+		return $shop_name . ' ' . $order_reference;
+	}
 
 	function before_process()
 	{
