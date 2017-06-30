@@ -303,8 +303,13 @@ class wirecard_checkout_page
 		                  'serviceURL' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL,
 		                  'trid' => $this->transaction_id,
 		                  'pluginVersion' => $pluginVersion,
+		                  'maxRetries' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES,
+		                  'displayText' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT,
 		                  'consumerMerchantCrmId' => md5($order->customer['email_address']));
 
+		if ( ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT == 'True' ) ) {
+			$postData['autoDeposit'] = true;
+		}
         $consumerData = $this->create_consumer_data($paymentType);
 		$postData = array_merge($postData, $consumerData);
 
@@ -859,18 +864,21 @@ class wirecard_checkout_page
 
 	function install()
 	{
-		$configuration = "'tep_draw_pull_down_menu(\'configuration\', array(array(\'id\' => \'demo\', \'text\' => \'Demo\'), array(\'id\' => \'test\', \'text\' => \'Test\'), array(\'id\' => \'test3d\', \'text\' => \'Test3D\'), array(\'id\' => \'production\', \'text\' => \'Production\')), '";
+		$configuration = "'tep_cfg_select_option(array(\'demo\', \'test\', \'test3d\', \'production\'), '";
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Enable Wirecard Checkout Page Module', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS', 'True', 'Do you want to accept Wirecard Checkout Page payments?', '6', '0', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Configuration', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG', 'demo', '', '6', '0', $configuration, now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('CustomerId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID', '', 'Enter the customer id you received from Wirecard CEE.', '6', '1', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ShopId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID', '', 'Enter the shop id you received from Wirecard CEE.', '6', '2', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Secret', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET', '', 'Enter the secret string (preshared key) you received from Wirecard CEE for the fingerprint-hash', '6', '3', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Configuration', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG', 'demo', 'For integration, select predefined configuration settings or \'Production\' for live systems', '6', '0', $configuration, now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('CustomerId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID', '', 'Customer number you received from Wirecard (customerId, i.e. D2#####).', '6', '1', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ShopId', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID', '', 'Shop identifier in case of more than one shop.', '6', '2', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Secret', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET', '', 'String which you received from Wirecard for signing and validating data to prove their authenticity.', '6', '3', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('IFrame', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME', 'False', 'Open Wirecard Checkout Page inside an IFrame.', '6', '4', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
 		$this->_payments->install_paymenttypes();
 
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ServiceUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL', '', 'Enter the URL to your contact page.', '6', '300', now())");
-		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ImageUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL', '', 'Enter the Url of the image which should be displayed during the payment process on the Wirecard Checkout Page.', '6', '301', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ServiceUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL', '', 'URL to web page containing your contact information (imprint).', '6', '300', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('ImageUrl', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL', '', 'Image Url for displaying an image on the Wirecard Checkout Page (95x65 pixels preferred).', '6', '301', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Max. Retries', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES', '-1', 'Maximal number of payment retries.', '6', '302', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Display text', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT', '', 'Display Text on the Wirecard Checkout Page.', '6', '302', now())");
+		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Automated deposit', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT', 'False', 'Enabling an automated deposit of payments. Please contact our sales teams to activate this feature.', '6', '302', 'tep_cfg_select_option(array(\'True\', \'False\'), ', now())");
 
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first', '6', '400', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Payment Zone', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ZONE', '0', 'If a zone is selected, only enable this payment method for that zone', '6', '410', 'tep_get_zone_class_title', 'tep_cfg_pull_down_zone_classes(', now())");
@@ -940,6 +948,9 @@ class wirecard_checkout_page
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SERVICEURL',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IMAGEURL',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT',
+			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING',
 			'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING',

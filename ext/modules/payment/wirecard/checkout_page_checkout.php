@@ -64,6 +64,12 @@ $breadcrumb->add(NAVBAR_TITLE_2);
 
 require(DIR_WS_INCLUDES . 'template_top.php');
 
+if( isset($_POST['financialInstitution'])) {
+	$form = $_SESSION['wirecard_checkout_page']['form'];
+	$form .= tep_draw_hidden_field('financialInstitution', $_POST['financialInstitution']);
+	$_SESSION['wirecard_checkout_page']['form'] = $form;
+}
+
 $iframeUrl = tep_href_link(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IFRAME, '', 'SSL');
 $windowName = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME;
 

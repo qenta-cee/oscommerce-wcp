@@ -32,7 +32,8 @@ class wirecard_checkout_page_payments {
 		array('code' => 'SOFORTUEBERWEISUNG', 'label' => 'SOFORT Banking'),
 		array('code' => 'TATRAPAY', 'label' => 'TatraPay'),
 		array('code' => 'TRUSTLY', 'label' => 'Trustly'),
-		array('code' => 'VOUCHER', 'label' => 'My Voucher')
+		array('code' => 'VOUCHER', 'label' => 'My Voucher'),
+		array('code' => 'QUICK', 'label' => 'Quick')
 	);
 
 	/**
@@ -98,25 +99,29 @@ class wirecard_checkout_page_payments {
 	 *
 	 * @return bool
 	 */
-	protected function preInvoiceCheck()
-	{
+	protected function preInvoiceCheck() {
 		global $order, $currencies;
 
 		$currency = $order->info['currency'];
-		$total = $order->info['total'];
-		$amount = $total;
+		$total    = $order->info['total'];
+		$amount   = $total;
 
-		$currencies = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES);
-		$countries = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES);
+		$currencies   = explode( ",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES );
+		$countries    = explode( ",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES );
 		$country_code = $order->billing['country']['iso_code_2'];
 
-		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING == "True" && $order->delivery ==! $order->billing){
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING == "True" &&
+		     $order->delivery == ! $order->billing &&
+		     MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER == 'payolution'
+		) {
 			return false;
 		}
 
-		return (($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT) &&
-		        ( in_array($currency, $currencies) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES) ) &&
-		        (in_array($country_code, $countries) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES)));
+		return ( ( $amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT ) &&
+		         ( in_array( $currency,
+				         $currencies ) && strlen( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES ) ) &&
+		         ( in_array( $country_code,
+				         $countries ) && strlen( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES ) ) );
 
 	}
 
@@ -125,25 +130,29 @@ class wirecard_checkout_page_payments {
 	 *
 	 * @return bool
 	 */
-	protected function preInstallmentCheck()
-	{
+	protected function preInstallmentCheck() {
 		global $order, $currencies;
 
 		$currency = $order->info['currency'];
-		$total = $order->info['total'];
-		$amount = $total;
+		$total    = $order->info['total'];
+		$amount   = $total;
 
-		$currencies = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES);
-		$countries = explode(",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES);
+		$currencies   = explode( ",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES );
+		$countries    = explode( ",", MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES );
 		$country_code = $order->billing['country']['iso_code_2'];
 
-		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING == "True" && $order->delivery ==! $order->billing){
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING == "True" &&
+		     $order->delivery == ! $order->billing &&
+		     MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER == 'payolution'
+		) {
 			return false;
 		}
 
-		return (($amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT) &&
-		        ( in_array($currency, $currencies) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES) ) &&
-		        (in_array($country_code, $countries) && strlen(MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES)));
+		return ( ( $amount >= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT && $amount <= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT ) &&
+		         ( in_array( $currency,
+				         $currencies ) && strlen( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES ) ) &&
+		         ( in_array( $country_code,
+				         $countries ) && strlen( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES ) ) );
 
 	}
 	/**
@@ -180,16 +189,16 @@ class wirecard_checkout_page_payments {
 
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
-		             values ('payolution terms', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS', 'False', '', '6', '500', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		             values ('payolution terms', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS', 'False', 'Consumer must accept payolution terms during the checkout process.', '6', '500', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
-		             values ('payolution mID', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID', '', '', '6', '501', now())");
+		             values ('payolution mID', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID', '', 'Your payolution merchant ID, non-base64-encoded.', '6', '501', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
-		             values ('Invoice provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER', 'payolution', '', '6', '502', $invoice_provider , now())");
+		             values ('Invoice provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER', 'payolution', 'Choose your invoice provider.', '6', '502', $invoice_provider , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
-		             values ('Invoice billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING', 'False', '', '6', '503', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		             values ('Invoice billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING', 'False', 'Only applicable for payolution', '6', '503', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
 		             values ('Allowed countries for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '504', now())");
@@ -205,10 +214,10 @@ class wirecard_checkout_page_payments {
 
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
-		             values ('Installment provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER', 'payolution', '', '6', '550', $installment_provider , now())");
+		             values ('Installment provider', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER', 'payolution', 'Choose your installment provider.', '6', '550', $installment_provider , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) 
-		             values ('Installment billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING', 'False', '', '6', '551', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
+		             values ('Installment billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING', 'False', 'Only applicable for payolution', '6', '551', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
 		             values ('Allowed countries for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '552', now())");

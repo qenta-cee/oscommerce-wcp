@@ -72,9 +72,9 @@ require(DIR_WS_INCLUDES . 'template_top.php');
 <?php echo tep_draw_form('order', tep_href_link(FILENAME_CHECKOUT_SUCCESS, 'action=update', 'SSL')); ?>
 
 <div class="contentContainer">
-    <?php
-        echo MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_DESC;
-    ?>
+	<?php
+	echo MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_DESC;
+	?>
 </div>
 
 <div class="contentContainer">
