@@ -225,12 +225,26 @@ class wirecard_checkout_page
 	{
 		$paymentType= $_POST['wirecard_checkout_page'];
 
+		if (tep_session_is_registered('customer_id'))
+		{
+			$consumerID = $_SESSION['customer_id'];
+		}
+
+		$sql = 'SELECT customers_dob, customers_fax FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id="' . $consumerID . '" LIMIT 1;';
+		$result = tep_db_query($sql);
+		$consumerInformation = $result->fetch_assoc();
+		$consumerBirthDate = date( 'Y' ) . "-" . date( 'm' ) . "-" . date( 'd' );
+		if ($consumerInformation['customers_dob'] != '0000-00-00 00:00:00')
+		{
+			$consumerBirthDateTimestamp = strtotime($consumerInformation['customers_dob']);
+			$consumerBirthDate = date('Y-m-d', $consumerBirthDateTimestamp);
+		}
+
 		$fields = array();
 		switch ( $paymentType ) {
 			case 'installment':
 				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$today         = date( 'Y' ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$birthday      = '<input type="date" name="wcp_birthday" value="' . $today . '" max="' . $maxDate . '" class="form-control" />';
+				$birthday      = '<input type="date" name="consumerBirthDate" value="' . $consumerBirthDate . '" max="' . $maxDate . '" class="form-control" required=true />';
 				$birthDayField = array(
 					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
 					'field' => $birthday
@@ -260,8 +274,7 @@ class wirecard_checkout_page
 				break;
 			case 'invoice':
 				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$today         = date( 'Y' ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$birthday      = '<input type="date" name="wcp_birthday" value="' . $today . '" max="' . $maxDate . '" class="form-control" />';
+				$birthday      = '<input type="date" name="consumerBirthDate" value="' . $consumerBirthDate . '" max="' . $maxDate . '" class="form-control" required=true/>';
 				$birthDayField = array(
 					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
 					'field' => $birthday
@@ -273,14 +286,13 @@ class wirecard_checkout_page
 				$terms    = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS;
 				$mId      = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID;
 
-				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms"/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
+				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms" required=true/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
 				if ( strlen( $mId ) ) {
 					$payolutionTerms .= '<a id="wcp-payolutionlink" href="https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=' . $mId . '" target="_blank"><b>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK . '</b></a>';
 				} else {
 					$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK;
 				}
 				$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2 . '</span>';
-
 				if ( $terms && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER == 'payolution') {
 					array_push( $fields, array(
 						'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS,
@@ -290,14 +302,14 @@ class wirecard_checkout_page
 				break;
 			case 'eps':
 			    $institutions = $this->_payments->get_eps_financial_institutions();
-				$institution_field = tep_draw_pull_down_menu("wcp_financial_institution", $institutions, '', 'class="form-control"');
+				$institution_field = tep_draw_pull_down_menu("financialInstitution", $institutions, '', 'class="form-control" required=true');
 				$field = array('title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION, 'field' => $institution_field);
 
 				array_push($fields, $field);
 				break;
 			case 'idl':
 				$institutions = $this->_payments->get_idl_financial_institutions();
-				$institution_field = tep_draw_pull_down_menu("wcp_financial_institution", $institutions, '', 'class="form-control"');
+				$institution_field = tep_draw_pull_down_menu("financialInstitution", $institutions, '', 'class="form-control" required=true');
 				$field = array('title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION, 'field' => $institution_field);
 
 				array_push($fields, $field);
@@ -353,8 +365,8 @@ class wirecard_checkout_page
 		$postData = array_merge($postData, $consumerData);
 
 		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET == 'True' ||
-		     ( $paymentType == 'Invoice' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER != 'payolution' ) ||
-		     ( $paymentType == 'Installment' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER != 'payolution' )
+		     ( $paymentType == 'invoice' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER != 'payolution' ) ||
+		     ( $paymentType == 'installment' && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER != 'payolution' )
 		) {
 			$postData = array_merge( $postData, $this->create_basket_data() );
 		}
@@ -435,7 +447,7 @@ class wirecard_checkout_page
 
 		$consumerData['consumerEmail'] = $order->customer['email_address'];
 
-		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING == 'True' || $paymentType == 'Invoice' || $paymentType == 'Installment' ) {
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING == 'True' || $paymentType == 'invoice' || $paymentType == 'installment' ) {
 			$deliveryInformation = $order->delivery;
 
 			if ($deliveryInformation['country']['iso_code_2'] == 'US' || $deliveryInformation['country']['iso_code_2'] == 'CA')
@@ -459,7 +471,7 @@ class wirecard_checkout_page
 			$consumerData = array_merge($consumerData, $shippingData);
         }
 
-		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING == 'True'  || $paymentType == 'Invoice' || $paymentType == 'Installment' ) {
+		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING == 'True'  || $paymentType == 'invoice' || $paymentType == 'installment' ) {
 			$billingInformation = $order->billing;
 			if ( $billingInformation['country']['iso_code_2'] == 'US' || $billingInformation['country']['iso_code_2'] == 'CA' ) {
 				$billingState = $this->_getZoneCodeByName( $billingInformation['state'] );
@@ -494,7 +506,6 @@ class wirecard_checkout_page
 	    $basket = array();
 	    $count = 0;
 	    $tax = 0;
-	    print_r($order);
 
 	    foreach ($order->products as $product) {
 	        $count++;
