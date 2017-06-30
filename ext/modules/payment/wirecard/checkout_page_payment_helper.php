@@ -201,10 +201,10 @@ class wirecard_checkout_page_payments {
 		             values ('Invoice billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING', 'False', 'Only applicable for payolution', '6', '503', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
-		             values ('Allowed countries for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '504', now())");
+		             values ('Allowed countries for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES', 'AT,DE,CH', 'Insert allowed countries (e.g. AT,DE)', '6', '504', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
-		             values ('Allowed currencies for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES', '', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '505', now())");
+		             values ('Allowed currencies for Invoice', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES', 'EUR', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '505', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
 		             values ('Invoice minimum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT', '10', '', '6', '506', now())");
@@ -220,10 +220,10 @@ class wirecard_checkout_page_payments {
 		             values ('Installment billing/shipping address must be identical', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING', 'False', 'Only applicable for payolution', '6', '551', 'tep_cfg_select_option(array(\'True\', \'False\'), ' , now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
-		             values ('Allowed countries for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES', '', 'Insert allowed countries (e.g. AT,DE)', '6', '552', now())");
+		             values ('Allowed countries for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES', 'AT,DE,CH', 'Insert allowed countries (e.g. AT,DE)', '6', '552', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
-		             values ('Allowed currencies for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES', '', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '553', now())");
+		             values ('Allowed currencies for Installment', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES', 'EUR', 'Insert allowed currencies (e.g. EUR,CHF)', '6', '553', now())");
 		tep_db_query("insert into " . TABLE_CONFIGURATION .
 		             " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) 
 		             values ('Installment minimum amount', 'MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT', '150', '','6', '551', now())");
