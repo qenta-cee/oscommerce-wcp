@@ -27,6 +27,8 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TEXT_DESCRIPTION', 'Wirecard Check
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS_TITLE','Wirecard Checkout Page Modul aktivieren');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_STATUS_DESC','M&ouml;chten Sie Zahlungen &uuml;ber Wirecard Checkout Page akzeptieren?');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG_TITLE', 'Konfiguration');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CONFIG_DESC', 'Zum Testen der Integration eine vordefinierte Konfiguration auswählen. Für Produktivsysteme \'Production\' auswählen.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID_TITLE','Kundennummer');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CUSTOMERID_DESC','Geben Sie Ihre WirecardCEE-Kundennummer ein.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SHOPID_TITLE','Shop ID');
@@ -35,6 +37,20 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET_TITLE','Secret');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET_DESC','Geben Sie den Secret (preshared key) f&uuml;r die Fingerprint-&Uuml;berpr&uuml;fung ein, den Sie von WirecardCEE erhalten haben.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME_TITLE','IFrame verwenden');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME_DESC','Startet den Wirecard Checkout Page Zahlungsprocess in einem IFrame innerhalb des Shops');
+
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES_TITLE', 'Max. Versuche');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES_DESC', 'Maximale Anzahl an Zahlungsversuchen.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT_TITLE', 'Text auf der Bezahlseite');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT_DESC', 'Text, der dem Kunden zu den Bestelldaten angezeigt wird.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT_TITLE', 'Automatisches abbuchen');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT_DESC', 'Automatisches Abbuchen der Zahlungen. Bitte kontaktieren Sie unsere Sales-Teams um dieses Feature freizuschalten.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET_TITLE', 'Warenkorbdaten des Konsumenten mitsenden');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET_DESC', 'Weiterleitung des Warenkorbs des Kunden an den Finanzdienstleister.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING_TITLE', 'Versanddaten des Konsumenten mitsenden');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING_DESC', 'Weiterleitung der Versanddaten des Kunden an den Finanzdienstleister.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING_TITLE', 'Verrechnungsdaten des Konsumenten mitsenden');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING_DESC', 'Weiterleitung der Verrechnungsdaten des Kunden an den Finanzdienstleister.');
+
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT_TITLE','Zahlungsoption SELECT');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT_DESC','Die Zahlungsmittelauswahl erfolgt auf der Wirecard Checkout Page. Wenn aktiviert, werden keine weiteren Zahlungsmodule der Wirecard Checkout Page im Shop angezeigt.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_TEXT_TITLE','Zahlungsoptionstext');

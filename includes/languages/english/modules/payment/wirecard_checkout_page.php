@@ -37,6 +37,19 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET_TITLE', 'Secret');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SECRET_DESC', 'String which you received from Wirecard for signing and validating data to prove their authenticity.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME_TITLE', 'use IFrame');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME_DESC', 'Start Wirecard Checkout Page in an IFrame inside your Shop.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES_TITLE', 'Max. Retries');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MAX_RETRIES_DESC', 'Maximal number of payment retries.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT_TITLE', 'Display text');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT_DESC', 'Display Text on the Wirecard Checkout Page.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT_TITLE', 'Automated deposit');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT_DESC', 'Enabling an automated deposit of payments. Please contact our sales teams to activate this feature.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET_TITLE', 'Forward basket data');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BASKET_DESC', 'Forwarding basket data to the respective financial service provider.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING_TITLE', 'Forward consumer shipping data');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_SHIPPING_DESC', 'Forwarding shipping data about your consumer to the respective financial service provider.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING_TITLE', 'Forward consumer billing data');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SEND_BILLING_DESC', 'Forwarding billing data about your consumer to the respective financial service provider.');
+
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT_TITLE', 'Enable payment type SELECT');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SELECT_DESC', 'The customer can select the payment type whithin Wirecard Checkout Page. If activated, no other payment type is displayed within the shop.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_TEXT_TITLE', 'Paysys text');
@@ -49,6 +62,8 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MAESTRO_TITLE', 'Maestro Se
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MAESTRO_DESC', 'Enable payment type Maestro SecureCode?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EPS_TITLE', 'eps Online Bank Transfer');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EPS_DESC', 'Enable payment type eps Online Bank Transfer?');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EPAY_BG_TITLE', 'ePay.bg');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EPAY_BG_DESC', 'Enable payment type ePay.bg?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PBX_TITLE', 'paybox');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PBX_DESC', 'Enable payment type paybox?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PSC_TITLE', 'paysafecard');
@@ -69,8 +84,8 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_INVOICE_TITLE', 'Invoice');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_INVOICE_DESC', 'Enable payment type Invoice?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_CCARD-MOTO_TITLE', 'Credit Card Moto');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_CCARD-MOTO_DESC', 'Enable payment type Credit Card without "Verified by Visa" and "MasterCard SecureCode"?');
-define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_BANCONTACT_MISTERCASH_TITLE', 'Bancontact/Mister Cash');
-define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_BANCONTACT_MISTERCASH_DESC', 'Enable payment type Bancontact/Mister Cash?');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_BANCONTACT_MISTERCASH_TITLE', 'Bancontact');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_BANCONTACT_MISTERCASH_DESC', 'Enable payment type Bancontact?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EKONTO_TITLE', 'eKonto');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_EKONTO_DESC', 'Enable payment type eKonto?');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_INSTALLMENT_TITLE', 'Installment');
@@ -88,11 +103,32 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SKRILLWALLET_DESC', 'Enable
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_TITLE', 'The financial institution has not yet approved your payment');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PENDING_DESC', 'Payment verification is pending, confirmation will be sent later.');
 
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS_TITLE', 'payolution terms');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS_DESC', 'Consumer must accept payolution terms during the checkout process.');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID_TITLE', 'payolution mID');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID_DESC', 'Your payolution merchant ID, non-base64-encoded.');
+
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER_TITLE', 'Invoice provider');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER_DESC', 'Choose your Invoice provider');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING_TITLE', 'Invoice billing/shipping address must be identical');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_SHIPPING_DESC', 'Only applicable for payolution');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES_TITLE', 'Allowed countries for Invoice');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_COUNTRIES_DESC', 'Insert allowed countries (e.g. AT,DE)');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES_TITLE', 'Allowed currencies for Invoice');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_CURRENCIES_DESC', 'Insert allowed currencies (e.g. EUR,CHF)');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT_TITLE', 'Invoice minimum amount');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MIN_AMOUNT_DESC', 'Enter minimum amount for invoice. (&euro;)');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT_TITLE', 'Invoice maximum amount');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_MAX_AMOUNT_DESC', 'Enter maximum amount for invoice. (&euro;)');
 
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER_TITLE', 'Installment provider');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER_DESC', 'Choose your Installment provider');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING_TITLE', 'Installment billing/shipping address must be identical');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_SHIPPING_DESC', 'Only applicable for payolution');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES_TITLE', 'Allowed countries for Installment');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_COUNTRIES_DESC', 'Insert allowed countries (e.g. AT,DE)');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES_TITLE', 'Allowed currencies for Installment');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_CURRENCIES_DESC', 'Insert allowed currencies (e.g. EUR,CHF)');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT_TITLE', 'Installment minimum amount');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MIN_AMOUNT_DESC', 'Enter minimum amount for installment. (&euro;)');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_MAX_AMOUNT_TITLE', 'Installment maximum amount');
@@ -143,7 +179,6 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_MONETA_TEXT', 'moneta.ru');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_PRZELEWY24_TEXT', 'Przelewy24');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_POLI_TEXT', 'POLi');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYSYS_SKRILLWALLET_TEXT', 'Skrill Digital Wallet');
-
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ERROR_TITEL', 'Payment error');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_ERROR_NOTRID', 'No transaction id');
