@@ -293,10 +293,9 @@ class wirecard_checkout_page_payments {
 			$count++;
 			$id = "wirecard_payment_table_".$count;
 			$payment_code = strtolower($payment['code']);
-			$js_helper = "document.getElementById('wirecard_checkout_page_payment').value='".$payment_code."'";
-			$content .= '</td></tr></tbody></table><table id="'.$id.'" border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffectCustomWcp(this)"><td>';
+			$content .= '</td></tr></tbody></table><table id="'.$id.'" border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" data-paymentcode="'.$payment_code.'" onclick="selectRowEffectCustomWcp(this)"><td>';
 			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right">'.
-			'<input type="radio" name="payment" value="' .$code. '" onclick='.$js_helper.'>';
+			'<input type="radio" name="payment" value="' .$code. '">';
 		}
 
 		$content .= '</td></tr><tr style="display:none;">';
@@ -304,6 +303,7 @@ class wirecard_checkout_page_payments {
 		<script type="text/javascript">
 		    function selectRowEffectCustomWcp(e){
 		     f = $(e).closest("table").index()-1;
+		     $("#wirecard_checkout_page_payment").val($(e).data("paymentcode"));
 		     selectRowEffect(e,f);   
 		    }
 				var checkoutTable = document.getElementById("wirecard_payment_table_1").previousElementSibling;
