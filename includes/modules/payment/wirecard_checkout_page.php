@@ -370,7 +370,7 @@ class wirecard_checkout_page
 		$process_button_string = '';
 		foreach ($postData AS $parameterName => $parameterValue)
 		{
-			$process_button_string .= tep_draw_hidden_field($parameterName, $parameterValue);
+			$process_button_string .= '<input type="hidden" name="'.$parameterName.'" value="'.$parameterValue.'"/>';
 		}
 		if (MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_USE_IFRAME == 'True')
 		{
