@@ -1,8 +1,8 @@
 # Wirecard Checkout Page plugin for osCommerce
 
 [![License](https://img.shields.io/badge/license-GPLv2-blue.svg)](https://raw.githubusercontent.com/wirecard/oscommerce-wcp/master/LICENSE)
-[![osCommerce](https://img.shields.io/badge/osCommerce-v2.3.3-green.svg)](https://www.oscommerce.com/)
-[![PHP v5.3](https://img.shields.io/badge/php-v5.3-yellow.svg)](http://www.php.net)
+[![osCommerce](https://img.shields.io/badge/osCommerce-v2.3.4-green.svg)](https://www.oscommerce.com/)
+[![PHP v5.6](https://img.shields.io/badge/php-v5.6-yellow.svg)](http://www.php.net)
 
 Wirecard Checkout Page plugin for osCommerce. 
 
