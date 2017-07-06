@@ -186,8 +186,52 @@ class wirecard_checkout_page
 		$fields = array();
 		switch ( $paymentType ) {
 			case 'installment':
-				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$birthday      = '<input type="date" name="consumerBirthDate" value="' . $consumerBirthDate . '" max="' . $maxDate . '" class="form-control" required=true />';
+            case 'invoice':
+			    $birthday = '<script type="text/javascript">
+                                function checkBirthday(){  
+                                    var m = $(\'#wcp_month\').val();
+                                    var d = $(\'#wcp_day\').val();
+                                    var dateStr = $(\'#wcp_year\').val() + \'-\' + m + \'-\' + d;
+                                    var minAge = 18;
+
+                                    var birthdate = new Date(dateStr);
+                                    var year = birthdate.getFullYear();
+                                    var today = new Date();
+                                    var limit = new Date((today.getFullYear() - minAge), today.getMonth(), today.getDate());
+                                    if (birthdate < limit) {
+                                        $(\'#wcp-birthday\').val(birthdate);
+                                        $(\'#wcp-no-valid-birthday\').hide();
+                                        $(\'#tdb5\').attr(\'disabled\', false);
+                                    } else {
+                                        $(\'#wcp-no-valid-birthday\').show();
+                                        $(\'#tdb5\').attr(\'disabled\', true);
+                                    }
+		                        }
+		                        window.onload = function() {
+                                    $(document).ready(function() {
+                                        checkBirthday();
+                                    });
+                                };
+			                </script>';
+				$birthday .= "<input type='hidden' id='wcp-birthday' name='consumerBirthDate'/><select name='wcp_day' id='wcp_day' onchange='checkBirthday();' class=''>";
+
+				for ( $day = 31; $day > 0; $day -- ) {
+					$birthday .= "<option value='$day'> $day </option>";
+				}
+
+				$birthday .= "</select>";
+
+				$birthday .= "<select name='wcp_month' id='wcp_month' onchange='checkBirthday();' class=''>";
+				for ( $month = 12; $month > 0; $month -- ) {
+					$birthday .= "<option value='$month'> $month </option>";
+				}
+				$birthday .= "</select>";
+
+				$birthday .= "<select name='wcp_year' id='wcp_year' onchange='checkBirthday();' class=''>";
+				for ( $year = date( "Y" ); $year > 1900; $year -- ) {
+					$birthday .= "<option value='$year'> $year </option>";
+				}
+				$birthday .= "</select><div id='wcp-no-valid-birthday'>".MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_BIRTHDAY_ERROR."</div>";
 				$birthDayField = array(
 					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
 					'field' => $birthday
@@ -198,9 +242,14 @@ class wirecard_checkout_page
 
 				$terms    = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS;
 				$mId      = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID;
-				$provider = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER;
 
-				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms"/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
+				if ( $paymentType == 'installment' ) {
+					$provider = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INSTALLMENT_PROVIDER;
+				} else {
+					$provider = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER;
+				}
+
+				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms" required />&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
 				if ( strlen( $mId ) ) {
 					$payolutionTerms .= '<a id="wcp-payolutionlink" href="https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=' . $mId . '" target="_blank"><b>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK . '</b></a>';
 				} else {
@@ -208,35 +257,7 @@ class wirecard_checkout_page
 				}
 				$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2 . '</span>';
 
-				if ( $terms && $provider == 'payolution') {
-					array_push( $fields, array(
-						'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS,
-						'field' => $payolutionTerms
-					) );
-				}
-				break;
-			case 'invoice':
-				$maxDate       = ( date( 'Y' ) - 18 ) . "-" . date( 'm' ) . "-" . date( 'd' );
-				$birthday      = '<input type="date" name="consumerBirthDate" value="' . $consumerBirthDate . '" max="' . $maxDate . '" class="form-control" required=true/>';
-				$birthDayField = array(
-					'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_BIRTHDAY_TEXT,
-					'field' => $birthday
-				);
-
-				array_push( $fields, $birthDayField );
-				array_push( $fields, array( 'title' => '', 'field' => '<br/>' ) );
-
-				$terms    = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TERMS;
-				$mId      = MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_MID;
-
-				$payolutionTerms = '<input type="checkbox" name="wcp_payolutionterms" required=true/>&nbsp;<span>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT1;
-				if ( strlen( $mId ) ) {
-					$payolutionTerms .= '<a id="wcp-payolutionlink" href="https://payment.payolution.com/payolution-payment/infoport/dataprivacyconsent?mId=' . $mId . '" target="_blank"><b>' . MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK . '</b></a>';
-				} else {
-					$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK;
-				}
-				$payolutionTerms .= MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2 . '</span>';
-				if ( $terms && MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_INVOICE_PROVIDER == 'payolution') {
+				if ( $terms && $provider == 'payolution' ) {
 					array_push( $fields, array(
 						'title' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS,
 						'field' => $payolutionTerms

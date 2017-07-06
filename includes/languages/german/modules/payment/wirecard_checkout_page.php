@@ -174,5 +174,6 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK', 'Einwilligung');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2', ' kann ich jederzeit mit Wirkung für die Zukunft widerrufen.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS', 'payolution Nutzungsbedingungen');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION', 'Finanzinstitut');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_BIRTHDAY_ERROR', 'Sie müssen mindestens 18 Jahre alt sein um dieses Zahlungsmittel zu nutzen.');
 
 ?>

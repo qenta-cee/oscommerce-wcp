@@ -194,4 +194,5 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_LINK', 'consent');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_CONSENT2', ' can be revoked at any time with effect for the future.');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PAYOLUTION_TERMS', 'payolution terms');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_FINANCIAL_INSTITUTION', 'Financial institution');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_BIRTHDAY_ERROR', 'You have to be 18 years or older to use this payment.');
 ?>
