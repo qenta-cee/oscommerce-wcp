@@ -294,7 +294,7 @@ class wirecard_checkout_page_payments {
 			$id = "wirecard_payment_table_".$count;
 			$payment_code = strtolower($payment['code']);
 			$js_helper = "document.getElementById('wirecard_checkout_page_payment').value='".$payment_code."'";
-			$content .= '</td></tr></tbody></table><table id="'.$id.'" border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffect(this, 0)"><td>';
+			$content .= '</td></tr></tbody></table><table id="'.$id.'" border="0" width="100%" cellspacing="0" cellpadding="2"><tbody><tr class="moduleRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="selectRowEffectCustomWcp(this)"><td>';
 			$content .= '<strong>' . $payment['label'] . '</strong></td><td align="right">'.
 			'<input type="radio" name="payment" value="' .$code. '" onclick='.$js_helper.'>';
 		}
@@ -302,6 +302,10 @@ class wirecard_checkout_page_payments {
 		$content .= '</td></tr><tr style="display:none;">';
 		$content .= '
 		<script type="text/javascript">
+		    function selectRowEffectCustomWcp(e){
+		     f = $(e).closest("table").index()-1;
+		     selectRowEffect(e,f);   
+		    }
 				var checkoutTable = document.getElementById("wirecard_payment_table_1").previousElementSibling;
 				checkoutTable.style.display = "none";
 			</script>';
