@@ -172,6 +172,18 @@ class wirecard_checkout_page
 		{
 			$consumerID = $_SESSION['customer_id'];
 		}
+		if(isset($_SESSION['wcp-consumerDeviceId'])) {
+			$consumerDeviceId = $_SESSION['wcp-consumerDeviceId'];
+		} else {
+			$timestamp = microtime();
+			$consumerDeviceId = md5($consumerID . "_" . $timestamp);
+			$_SESSION['wcp-consumerDeviceId'] = $consumerDeviceId;
+		}
+		$ratepay = '<script language="JavaScript">var di = {t:"'.$consumerDeviceId.'",v:"WDWL",l:"Checkout"};</script>';
+		$ratepay .= '<script type="text/javascript" src="//d.ratepay.com/'.$consumerDeviceId.'/di.js"></script>';
+		$ratepay .= '<noscript><link rel="stylesheet" type="text/css" href="//d.ratepay.com/di.css?t='.$consumerDeviceId.'&v=WDWL&l=Checkout"></noscript>';
+		$ratepay .= '<object type="application/x-shockwave-flash" data="//d.ratepay.com/WDWL/c.swf" width="0" height="0"><param name="movie" value="//d.ratepay.com/WDWL/c.swf" /><param name="flashvars" value="t='.$consumerDeviceId.'&v=WDWL"/><param name="AllowScriptAccess" value="always"/></object>';
+		echo $ratepay;
 
 		$sql = 'SELECT customers_dob, customers_fax FROM ' . TABLE_CUSTOMERS . ' WHERE customers_id="' . $consumerID . '" LIMIT 1;';
 		$result = tep_db_query($sql);
@@ -198,7 +210,7 @@ class wirecard_checkout_page
                                     var year = birthdate.getFullYear();
                                     var today = new Date();
                                     var limit = new Date((today.getFullYear() - minAge), today.getMonth(), today.getDate());
-                                    if (birthdate < limit) {
+                                    if (birthdate <= limit) {
                                         $(\'#wcp-birthday\').val(birthdate);
                                         $(\'#wcp-no-valid-birthday\').hide();
                                         $(\'#tdb5\').attr(\'disabled\', false);
@@ -328,6 +340,11 @@ class wirecard_checkout_page
 		                  'displayText' => MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DISPLAY_TEXT,
 		                  'consumerMerchantCrmId' => md5($order->customer['email_address']));
 
+		if(isset($_SESSION['wcp-consumerDeviceId'])) {
+			$postData['consumerDeviceId'] = $_SESSION['wcp-consumerDeviceId'];
+			unset($_SESSION['wcp-consumerDeviceId']);
+		}
+		
 		if ( MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_DEPOSIT == 'True' ) {
 			$postData['autoDeposit'] = true;
 		}
