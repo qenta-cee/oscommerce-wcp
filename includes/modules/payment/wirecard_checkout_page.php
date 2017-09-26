@@ -36,7 +36,7 @@ define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_CHECKOUT', 'ext/modules/payment/wi
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_IFRAME', 'ext/modules/payment/wirecard/checkout_page_iframe.php');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_SUCCESS', 'ext/modules/payment/wirecard/checkout_page_success.php');
 
-define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PLUGINVERSION', '1.6.1');
+define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_PLUGINVERSION', '1.6.2');
 
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_TRANSACTION_TABLE', 'wirecard_checkout_page_transaction');
 define('MODULE_PAYMENT_WIRECARD_CHECKOUT_PAGE_WINDOW_NAME', 'wirecardCheckoutPageIFrame');

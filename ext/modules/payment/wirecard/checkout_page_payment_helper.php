@@ -29,7 +29,7 @@ class wirecard_checkout_page_payments {
 		array('code' => 'PSC', 'label' => 'paysafecard'),
 		array('code' => 'SEPA-DD', 'label' => 'SEPA Direct Debit'),
 		array('code' => 'SKRILLWALLET', 'label' => 'Skrill Digital Wallet'),
-		array('code' => 'SOFORTUEBERWEISUNG', 'label' => 'SOFORT Banking'),
+		array('code' => 'SOFORTUEBERWEISUNG', 'label' => 'Online bank transfer.'),
 		array('code' => 'TATRAPAY', 'label' => 'TatraPay'),
 		array('code' => 'TRUSTLY', 'label' => 'Trustly'),
 		array('code' => 'VOUCHER', 'label' => 'My Voucher'),
