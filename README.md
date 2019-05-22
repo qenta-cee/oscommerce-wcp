@@ -5,6 +5,14 @@
 [![PHP v5.6](https://img.shields.io/badge/php-v5.6-yellow.svg)](http://www.php.net)
 [![PHP v7.1](https://img.shields.io/badge/php-v7.1-yellow.svg)](http://www.php.net)
 
+----
+**IMPORTANT INFORMATION**  
+You are visiting a shop extension which will become obsolete in the near future. It will be replaced by a new one, which has new features and enhanced functionality very soon.  
+Please then use our new shop extension available on oscommerce.wirecard.com, which will be released soon and then maintained, updated and supported on a regular basis.  
+If you have any questions, please contact shop-systems-support@wirecard.com
+
+----
+
 Wirecard Checkout Page plugin for osCommerce. 
 
 Our [Online Guides](https://guides.wirecard.at/) provide further information on payment methods and additional features. Please observe our [terms of use](https://guides.wirecard.at/shop_plugins:info#terms_of_use) regarding plugins.
